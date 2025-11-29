@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In • IoT Analytics Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .login-layout {
+            background:
+                radial-gradient(circle at 15% 25%, rgba(0, 245, 160, 0.12), transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(0, 217, 255, 0.1), transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.08), transparent 50%),
+                linear-gradient(135deg, #0a0e27 0%, #0d1235 50%, #0a0e27 100%);
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 245, 160, 0.3), transparent 70%);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.25), transparent 70%);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: 2s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.2), transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(2deg);
+            }
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 245, 160, 0.4), transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s ease-in-out infinite;
+            filter: blur(20px);
+        }
+
+        .brand-text {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00f5a0, #00d9ff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .brand-subtitle {
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            background: rgba(13, 20, 40, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(13, 20, 40, 0.9);
+            border-color: #00f5a0;
+            box-shadow: 0 0 0 4px rgba(0, 245, 160, 0.15),
+                0 8px 24px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #00f5a0, #00d9a0);
+            border: none;
+            padding: 14px 24px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 8px 32px rgba(0, 245, 160, 0.4);
+            transition: all 0.3s ease;
+            color: #0a0e27;
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 48px rgba(0, 245, 160, 0.6);
+        }
+
+        .demo-box {
+            background: linear-gradient(135deg, rgba(0, 245, 160, 0.1), rgba(0, 217, 255, 0.1));
+            border: 2px solid rgba(0, 245, 160, 0.3);
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00f5a0;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 4s infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="login-layout">
+    <!-- Floating Orbs -->
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+
+    <!-- Particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 1.5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 0.5s;"></div>
+
+    <div class="login-card" style="max-width: 480px; padding: 50px 40px;">
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-glow"></div>
+            <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="position: relative; z-index: 1;">
+                <!-- Outer Circle -->
+                <circle cx="60" cy="60" r="55" fill="none" stroke="url(#gradient1)" stroke-width="3" opacity="0.5" />
+
+                <!-- Inner Rotating Rings -->
+                <circle cx="60" cy="60" r="45" fill="none" stroke="url(#gradient2)" stroke-width="2"
+                    stroke-dasharray="10 5" opacity="0.7">
+                    <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="8s"
+                        repeatCount="indefinite" />
+                </circle>
+
+                <circle cx="60" cy="60" r="35" fill="none" stroke="url(#gradient3)" stroke-width="2"
+                    stroke-dasharray="8 4" opacity="0.8">
+                    <animateTransform attributeName="transform" type="rotate" from="360 60 60" to="0 60 60" dur="6s"
+                        repeatCount="indefinite" />
+                </circle>
+
+                <!-- Center Icon - IoT Symbol -->
+                <g transform="translate(60, 60)">
+                    <!-- Central Node -->
+                    <circle cx="0" cy="0" r="8" fill="url(#gradient4)">
+                        <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Connection Lines -->
+                    <line x1="0" y1="0" x2="0" y2="-20" stroke="#00f5a0" stroke-width="2" opacity="0.8" />
+                    <line x1="0" y1="0" x2="17" y2="-10" stroke="#00d9ff" stroke-width="2" opacity="0.8" />
+                    <line x1="0" y1="0" x2="17" y2="10" stroke="#a78bfa" stroke-width="2" opacity="0.8" />
+                    <line x1="0" y1="0" x2="0" y2="20" stroke="#00f5a0" stroke-width="2" opacity="0.8" />
+                    <line x1="0" y1="0" x2="-17" y2="10" stroke="#00d9ff" stroke-width="2" opacity="0.8" />
+                    <line x1="0" y1="0" x2="-17" y2="-10" stroke="#a78bfa" stroke-width="2" opacity="0.8" />
+
+                    <!-- Outer Nodes -->
+                    <circle cx="0" cy="-20" r="4" fill="#00f5a0">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="17" cy="-10" r="4" fill="#00d9ff">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.3s"
+                            repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="17" cy="10" r="4" fill="#a78bfa">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.6s"
+                            repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="0" cy="20" r="4" fill="#00f5a0">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.9s"
+                            repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="-17" cy="10" r="4" fill="#00d9ff">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.2s"
+                            repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="-17" cy="-10" r="4" fill="#a78bfa">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.5s"
+                            repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Gradients -->
+                <defs>
+                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00f5a0;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00d9ff;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00f5a0;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="gradient4">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00f5a0;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- Brand Text -->
+        <h1 class="brand-text">IoT Analytics</h1>
+        <p class="brand-subtitle">Next-Generation Monitoring Platform</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, msg in messages %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+            style="border-radius: 14px; border: 2px solid rgba(255, 107, 107, 0.3); background: rgba(255, 107, 107, 0.1); color: #ff6b6b; font-weight: 600;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+            <div class="mb-4">
+                <label class="form-label">
+                    <i class="bi bi-person-circle" style="font-size: 18px; color: #00f5a0;"></i> Username
+                </label>
+                <input type="text" name="username" class="form-control" placeholder="Enter your username" required
+                    autocomplete="username">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">
+                    <i class="bi bi-shield-lock-fill" style="font-size: 18px; color: #00d9ff;"></i> Password
+                </label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required
+                    autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-login w-100">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Dashboard
+            </button>
+        </form>
+
+        <div class="demo-box">
+            <div style="text-align: center;">
+                <div
+                    style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="bi bi-key-fill me-2" style="color: #00f5a0;"></i>Demo Credentials
+                </div>
+                <div
+                    style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 14px; font-family: 'Courier New', monospace;">
+                    <div style="color: #00f5a0; font-size: 15px; font-weight: 700; margin-bottom: 6px;">
+                        <i class="bi bi-person-badge"></i> admin
+                    </div>
+                    <div style="color: #00d9ff; font-size: 15px; font-weight: 700;">
+                        <i class="bi bi-lock"></i> admin123
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center"
+            style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p
+                style="font-size: 12px; color: #94a3b8; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="bi bi-shield-check" style="color: #00f5a0; font-size: 16px;"></i>
+                <span>Secured with industry-standard encryption</span>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

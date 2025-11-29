@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alerts • IoT Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-main: #020617; --bg-panel: #0b1224; --bg-card: #0f172a;
+            --text-main: #ffffff; --text-muted: #e2e8f0; --accent: #22c55e;
+        }
+        body { margin: 0; min-height: 100vh; background: var(--bg-main); color: var(--text-main); font-family: "Inter", system-ui, -apple-system, sans-serif; }
+        .text-muted { color: var(--text-muted) !important; opacity: 1 !important; }
+        .small { color: var(--text-muted) !important; opacity: 1 !important; }
+        .app-shell { display: flex; min-height: 100vh; }
+        .sidebar { width: 70px; background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(148, 163, 184, 0.18); display: flex; flex-direction: column; align-items: center; padding: 16px 10px; position: sticky; top: 0; height: 100vh; transition: width 0.25s ease; z-index: 20; }
+        .sidebar:hover { width: 220px; }
+        .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; width: 100%; }
+        .sidebar-logo { height: 34px; width: 34px; border-radius: 12px; background: radial-gradient(circle at 30% 30%, #38bdf8, #0f172a); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #f9fafb; }
+        .sidebar-title { opacity: 0; white-space: nowrap; font-size: 14px; font-weight: 600; color: #f9fafb; transition: opacity 0.25s ease; }
+        .sidebar:hover .sidebar-title { opacity: 1; }
+        .nav-item-btn { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 999px; color: var(--text-muted); font-size: 14px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; width: 100%; text-decoration: none; }
+        .nav-item-btn.active, .nav-item-btn:hover { background: rgba(15, 118, 110, 0.35); color: #22c55e; }
+        .nav-item-btn i { font-size: 18px; min-width: 24px; text-align: center; }
+        .nav-item-label { opacity: 0; transition: opacity 0.25s ease; }
+        .sidebar:hover .nav-item-label { opacity: 1; }
+        .main { flex: 1; padding: 18px 22px 26px; background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.08), transparent 55%), radial-gradient(circle at 100% 100%, rgba(45, 212, 191, 0.08), transparent 55%), #020617; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .card-panel { background: var(--bg-panel); border: 1px solid rgba(148, 163, 184, 0.12); border-radius: 14px; padding: 16px; }
+        .badge-pill { padding: 6px 10px; border-radius: 999px; }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">IA</div>
+                <span class="sidebar-title">IoT Analytics</span>
+            </div>
+            <ul class="list-unstyled w-100 sidebar-nav">
+                <li><a href="{{ url_for('dashboard') }}" class="nav-item-btn {{ 'active' if active_page == 'dashboard' else '' }}"><i class="bi bi-activity"></i><span class="nav-item-label">Live Dashboard</span></a></li>
+                <li><a href="{{ url_for('devices') }}" class="nav-item-btn {{ 'active' if active_page == 'devices' else '' }}"><i class="bi bi-cpu"></i><span class="nav-item-label">Devices</span></a></li>
+                <li><a href="{{ url_for('alerts') }}" class="nav-item-btn {{ 'active' if active_page == 'alerts' else '' }}"><i class="bi bi-bell"></i><span class="nav-item-label">Alerts</span></a></li>
+                <li><a href="{{ url_for('trends') }}" class="nav-item-btn {{ 'active' if active_page == 'trends' else '' }}"><i class="bi bi-graph-up-arrow"></i><span class="nav-item-label">Trends</span></a></li>
+                <li><a href="{{ url_for('streaming') }}" class="nav-item-btn {{ 'active' if active_page == 'streaming' else '' }}"><i class="bi bi-broadcast"></i><span class="nav-item-label">Streaming</span></a></li>
+            </ul>
+            <div class="mt-auto w-100">
+                <a class="nav-item-btn" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i><span class="nav-item-label">Logout</span></a>
+            </div>
+        </aside>
+        <main class="main">
+            <div class="topbar">
+                <div>
+                    <h3 class="mb-0">Alerts</h3>
+                    <div class="text-muted">Recent anomalies, thresholds, and device issues</div>
+                </div>
+                <div class="badge-pill bg-dark text-white"><i class="bi bi-person-circle me-2"></i>{{ user.name if user else 'User' }}</div>
+            </div>
+
+            <div class="card-panel mb-3" id="alert-stats">Loading...</div>
+
+            <div class="card-panel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Latest Alerts</h6>
+                    <small class="text-muted">Last 100 events</small>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Device</th>
+                                <th>Type</th>
+                                <th>Temperature</th>
+                                <th>Vibration</th>
+                                <th>Battery</th>
+                                <th>Health</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alerts-table">
+                            <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function fetchAnalytics() {
+            const res = await fetch("/api/analytics");
+            if (!res.ok) throw new Error("Failed to load alerts");
+            return res.json();
+        }
+
+        function extractAlerts(data) {
+            const items = [];
+            data.forEach(row => {
+                const alertTypes = [];
+                if (row.overheat) alertTypes.push("Overheat");
+                if (row.high_vibration) alertTypes.push("High Vibration");
+                if (row.low_battery) alertTypes.push("Low Battery");
+                if (row.battery_drop) alertTypes.push("Battery Drop");
+                if (row.anomaly) alertTypes.push("Anomaly");
+                if (!alertTypes.length) return;
+                items.push({
+                    ts: new Date(row.timestamp),
+                    device: row.device_id,
+                    alertTypes,
+                    temperature: row.temperature,
+                    vibration: row.vibration,
+                    battery: row.battery,
+                    health: row.health
+                });
+            });
+            return items.sort((a, b) => b.ts - a.ts).slice(0, 100);
+        }
+
+        function renderStats(alerts) {
+            const byType = {};
+            alerts.forEach(a => a.alertTypes.forEach(t => byType[t] = (byType[t] || 0) + 1));
+            const total = alerts.length;
+            const statEl = document.getElementById("alert-stats");
+            statEl.innerHTML = `
+                <div class="d-flex flex-wrap gap-4">
+                    <div>
+                        <div class="text-muted small">Total alerts</div>
+                        <div class="fs-4 fw-bold">${total}</div>
+                    </div>
+                    ${Object.entries(byType).map(([k,v]) => `
+                        <div>
+                            <div class="text-muted small">${k}</div>
+                            <div class="fw-semibold">${v}</div>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function renderTable(alerts) {
+            const tbody = document.getElementById("alerts-table");
+            if (!alerts.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No alerts yet</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = alerts.map(a => `
+                <tr>
+                    <td>${a.ts.toLocaleString()}</td>
+                    <td>${a.device}</td>
+                    <td>${a.alertTypes.join(", ")}</td>
+                    <td>${a.temperature?.toFixed(2)} °C</td>
+                    <td>${a.vibration?.toFixed(2)} g</td>
+                    <td>${a.battery}%</td>
+                    <td>${a.health?.toFixed(1)}%</td>
+                </tr>
+            `).join("");
+        }
+
+        async function loadAlerts() {
+            try {
+                const data = await fetchAnalytics();
+                const alerts = extractAlerts(data);
+                renderStats(alerts);
+                renderTable(alerts);
+            } catch (err) {
+                document.getElementById("alerts-table").innerHTML =
+                    `<tr><td colspan="7" class="text-danger text-center">${err.message}</td></tr>`;
+            }
+        }
+
+        loadAlerts();
+        setInterval(loadAlerts, 5000);
+    </script>
+</body>
+</html>
